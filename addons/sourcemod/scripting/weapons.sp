@@ -54,6 +54,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	
 	g_hOnKnifeSelect_Pre = CreateGlobalForward("Weapons_OnClientKnifeSelectPre", ET_Event, Param_Cell, Param_Cell, Param_String);
 	g_hOnKnifeSelect_Post = CreateGlobalForward("Weapons_OnClientKnifeSelectPost", ET_Ignore, Param_Cell, Param_Cell, Param_String);
+	g_hOnMenuOpen = new GlobalForward("Weapons_OnMenuOpen", ET_Hook, Param_Cell);
+	g_hOnSkinApply = new GlobalForward("Weapons_OnSkinApply", ET_Hook, Param_Cell);
+	g_hOnKnifeChange = new GlobalForward("Weapons_OnKnifeChange", ET_Hook, Param_Cell);
 	return APLRes_Success;
 }
 
@@ -177,7 +180,7 @@ public Action Command_GetClientKnife(int client, int args)
 
 public Action CommandWeaponSkins(int client, int args)
 {
-	if (IsValidClient(client))
+	if (IsValidClient(client) && Call_OnMenuOpen(client))
 	{
 		int menuTime;
 		if((menuTime = GetRemainingGracePeriodSeconds(client)) >= 0)
@@ -205,7 +208,7 @@ public Action CommandSeedMenu(int client, int args)
 
 public Action CommandKnife(int client, int args)
 {
-	if (IsValidClient(client))
+	if (IsValidClient(client) && Call_OnMenuOpen(client))
 	{
 		int menuTime;
 		if((menuTime = GetRemainingGracePeriodSeconds(client)) >= 0)
@@ -222,7 +225,7 @@ public Action CommandKnife(int client, int args)
 
 public Action CommandWSLang(int client, int args)
 {
-	if (IsValidClient(client))
+	if (IsValidClient(client) && Call_OnMenuOpen(client))
 	{
 		int menuTime;
 		if((menuTime = GetRemainingGracePeriodSeconds(client)) >= 0)
@@ -250,6 +253,11 @@ public Action CommandNameTag(int client, int args)
 
 void SetWeaponProps(int client, int entity)
 {
+	if (!Call_OnSkinApply(client))
+	{
+		return;
+	}
+	
 	int index = GetWeaponIndex(entity);
 	if (index > -1 && g_iSkins[client][index] != 0)
 	{
@@ -372,4 +380,37 @@ public Action ReserveAmmoTimer(Handle timer, DataPack pack)
 	{
 		SetEntData(clientIndex, offset, ammo, 4, true);
 	}
+}
+
+bool Call_OnMenuOpen(int client)
+{
+	Call_StartForward(g_hOnMenuOpen);
+	Call_PushCell(client);
+
+	Action result;
+	Call_Finish(result);
+
+	return !(result >= Plugin_Handled);
+}
+
+bool Call_OnSkinApply(int client)
+{
+	Call_StartForward(g_hOnSkinApply);
+	Call_PushCell(client);
+
+	Action result;
+	Call_Finish(result);
+
+	return !(result >= Plugin_Handled);
+}
+
+bool Call_OnKnifeChange(int client)
+{
+	Call_StartForward(g_hOnKnifeChange);
+	Call_PushCell(client);
+
+	Action result;
+	Call_Finish(result);
+
+	return !(result >= Plugin_Handled);
 }

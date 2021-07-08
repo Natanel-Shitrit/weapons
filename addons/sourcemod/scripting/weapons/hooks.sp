@@ -31,7 +31,7 @@ Action GiveNamedItemPre(int client, char classname[64], CEconItemView &item, boo
 {
 	if (IsValidClient(client))
 	{
-		if (g_iKnife[client] != 0 && IsKnifeClass(classname))
+		if (g_iKnife[client] != 0 && IsKnifeClass(classname) && Call_OnKnifeChange(client))
 		{
 			ignoredCEconItemView = true;
 			strcopy(classname, sizeof(classname), g_WeaponClasses[g_iKnife[client]]);

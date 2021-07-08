@@ -122,3 +122,7 @@ StringMap g_smLanguageIndex;
 
 GlobalForward g_hOnKnifeSelect_Pre;
 GlobalForward g_hOnKnifeSelect_Post;
+
+GlobalForward g_hOnMenuOpen;
+GlobalForward g_hOnSkinApply;
+GlobalForward g_hOnKnifeChange;
